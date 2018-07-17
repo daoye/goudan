@@ -7,7 +7,7 @@ import socket
 import ssl
 import select
 import http.client
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qsl
 import threading
 import gzip
 import zlib
@@ -43,10 +43,6 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 
 
 class ProxyRequestHandler(BaseHTTPRequestHandler):
-    cakey = join_with_script_dir('ca.key')
-    cacert = join_with_script_dir('ca.crt')
-    certkey = join_with_script_dir('cert.key')
-    certdir = join_with_script_dir('certs/')
     timeout = 5
     lock = threading.Lock()
 
@@ -64,18 +60,15 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         self.log_message(format, *args)
 
     def do_CONNECT(self):
-            self.connect_relay()
-
-    def connect_relay(self):
         address = self.path.split(':', 1)
         address[1] = int(address[1]) or 443
+
         try:
             s = socket.create_connection(address, timeout=self.timeout)
-        except Exception as e:
+        except Exception :
             self.send_error(502)
             return
-        self.send_response(200, 'Connection Established')
-        self.end_headers()
+
 
         conns = [self.connection, s]
         self.close_connection = 0
@@ -121,9 +114,9 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
             origin = (scheme, netloc)
             if not origin in self.tls.conns:
                 if scheme == 'https':
-                    self.tls.conns[origin] = httplib.HTTPSConnection(netloc, timeout=self.timeout)
+                    self.tls.conns[origin] = http.client.HTTPSConnection(netloc, timeout=self.timeout)
                 else:
-                    self.tls.conns[origin] = httplib.HTTPConnection(netloc, timeout=self.timeout)
+                    self.tls.conns[origin] = http.client.HTTPConnection(netloc, timeout=self.timeout)
             conn = self.tls.conns[origin]
             conn.request(self.command, path, req_body, dict(req.headers))
             res = conn.getresponse()
@@ -142,7 +135,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
                 return
 
             res_body = res.read()
-        except Exception as e:
+        except Exception:
             if origin in self.tls.conns:
                 del self.tls.conns[origin]
             self.send_error(502)
@@ -241,7 +234,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
 
     def print_info(self, req, req_body, res, res_body):
         def parse_qsl(s):
-            return '\n'.join("%-20s %s" % (k, v) for k, v in urlparse.parse_qsl(s, keep_blank_values=True))
+            return '\n'.join("%-20s %s" % (k, v) for k, v in parse_qsl(s))
 
         req_header_text = "%s %s %s\n%s" % (req.command, req.path, req.request_version, req.headers)
         res_header_text = "%s %d %s\n%s" % (res.response_version, res.status, res.reason, res.headers)
@@ -333,7 +326,7 @@ def run(HandlerClass=ProxyRequestHandler, ServerClass=ThreadingHTTPServer, proto
     if sys.argv[1:]:
         port = int(sys.argv[1])
     else:
-        port = 8080
+        port = 1991
     server_address = ('::1', port)
 
     HandlerClass.protocol_version = protocol
