@@ -3,8 +3,6 @@
 
 
 import unittest
-from tests.samplePoolTest import SamplePoolTest
-
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
@@ -13,6 +11,8 @@ if __name__ == '__main__':
     # suite.addTests(tests)
     suite.addTests(unittest.TestLoader().loadTestsFromName(
         'tests.samplePoolTest.SamplePoolTest'))
+    suite.addTests(unittest.TestLoader().loadTestsFromName(
+        'tests.checkerTest.CheckerTest'))
 
     # runner = unittest.TextTestRunner(verbosity=1)
     runner = unittest.TextTestRunner()
