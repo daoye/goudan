@@ -13,6 +13,8 @@ if __name__ == '__main__':
         'tests.samplePoolTest.SamplePoolTest'))
     suite.addTests(unittest.TestLoader().loadTestsFromName(
         'tests.checkerTest.CheckerTest'))
+    suite.addTests(unittest.TestLoader().loadTestsFromName(
+        'tests.piplineTest.PiplineTest'))
 
     # runner = unittest.TextTestRunner(verbosity=1)
     runner = unittest.TextTestRunner()
