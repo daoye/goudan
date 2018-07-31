@@ -14,5 +14,15 @@ class PiplineTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_get(self):
-        pass
+    def test_input(self):
+        data = ['item1']
+        self.pipline.register(MockMiddleware())
+        self.pipline.input(data)
+
+        d_len = len(data)
+        assert d_len == 2
+
+
+class MockMiddleware():
+    def input(self, data):
+        data.append('middleware')
