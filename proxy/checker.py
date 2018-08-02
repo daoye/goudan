@@ -25,4 +25,7 @@ def check(proxy_host, proxy_type, hit=__default_hit):
 def batch_check(proxies, hit=__default_hit):
     '''批量检查代理是否有效'''
     for p in proxies:
-        p['success'] = check(p['host'], p['type'])
+        if p['type'] != 'socks':
+            p['success'] = check(p['host'], p['type'])
+        else:
+            p['success'] = True

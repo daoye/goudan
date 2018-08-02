@@ -4,11 +4,20 @@
 import socket
 import select
 from concurrent.futures import ThreadPoolExecutor
+from core.samplePool import SamplePool
 
 
 def process(conn, addr):
+    host = SamplePool().get()
+    if not host:
+        return None
+
+    host_sep = host['host'].split(':')
+    ip = host_sep[0]
+    port = int(host_sep[1])
+
     proxy_conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    proxy_conn.connect(('127.0.0.1', 1080))
+    proxy_conn.connect((ip, port))
     conn.setblocking(socket.MSG_DONTWAIT)
     proxy_conn.setblocking(socket.MSG_DONTWAIT)
     closed = False

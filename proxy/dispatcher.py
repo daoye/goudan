@@ -13,16 +13,17 @@ def run():
     # register middlewares
     for name in setting.pipeline_middlewares:
         cls = __load_cls(name)
-        pipline.register(cls)
+        pipline.register(cls())
 
     # run spiders
     for name in setting.spiders:
         try:
             s = __load_cls(name)
-            data = s.run()
+            data = s().run()
             if data:
                 pipline.input(data)
-        except:
+        except Exception as e:
+            raise e
             print('spider [%s], run failed.' % name)
             pass
 
