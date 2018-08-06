@@ -1,63 +1,71 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import socket
-import select
-from concurrent.futures import ThreadPoolExecutor
+import asyncio
 from core.samplePool import SamplePool
 
 
-def process(conn, addr):
-    host = SamplePool().get()
-    if not host:
-        return None
+class ServerProtocol(asyncio.Protocol):
+    def __init__(self, loop):
+        self.loop = loop
+        host = SamplePool().get()
+        host_sep = host['host'].split(':')
+        self.proxy_ip = host_sep[0]
+        self.proxy_port = int(host_sep[1])
+        self.clients = {}
 
-    host_sep = host['host'].split(':')
-    ip = host_sep[0]
-    port = int(host_sep[1])
+    def connection_made(self, transport):
+        self.peername = transport.get_extra_info('peername')
+        self.transport = transport
 
-    proxy_conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    proxy_conn.connect((ip, port))
-    conn.setblocking(socket.MSG_DONTWAIT)
-    proxy_conn.setblocking(socket.MSG_DONTWAIT)
-    closed = False
-    while not closed:
-        rlist, _, _ = select.select([conn, proxy_conn], [], [])
-        for r in rlist:
-            w = proxy_conn if r is conn else conn
+    def data_received(self, data):
+        asyncio.Task(self.task_send(data))
+
+    @asyncio.coroutine
+    def task_send(self, data):
+        client = self.clients.get(self.peername)
+        if not client or not client.connected:
+            _, proxy_protocol = yield from self.loop.create_connection(lambda:  ProxyProtocol(self.transport), self.proxy_ip, self.proxy_port)
+            self.clients[self.peername] = proxy_protocol
+            client = proxy_protocol
+        client.transport.write(data)
+
+    def connection_lost(self, exc):
+        for x in self.clients.values():
             try:
-                d = r.recv(1024)
-                if not d:
-                    closed = True
-                    break
-                w.sendall(d)
+                if x.connected:
+                    x.transport.close()
             except:
-                closed = True
-                break
+                pass
 
-    try:
-        proxy_conn.shutdown(socket.SHUT_RDWR)
-        proxy_conn.close()
-    except:
-        pass
 
-    try:
-        conn.shutdown(socket.SHUT_RDWR)
-        conn.close()
-    except:
-        pass
+class ProxyProtocol(asyncio.Protocol):
+    def __init__(self, server):
+        self.server = server
+        self.connected = False
+
+    def connection_made(self, transport):
+        self.transport = transport
+        self.connected = True
+
+    def data_received(self, data):
+        self.server.write(data)
+
+    def connection_lost(self, exc):
+        self.connected = False
 
 
 def start():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('', 1991))
-    s.listen(10)
-    pool = ThreadPoolExecutor(128)
-    print('Server listen on 0.0.0.0:1991')
-    while True:
-        conn, addr = s.accept()
-        pool.submit(process, conn, addr)
+    loop = asyncio.get_event_loop()
+    coro = loop.create_server(lambda: ServerProtocol(loop), '', 1991)
+    server = loop.run_until_complete(coro)
 
+    print('Serving on {}'.format(server.sockets[0].getsockname()))
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
 
-if __name__ == '__main__':
-    start()
+    server.close()
+    loop.run_until_complete(server.wait_closed())
+    loop.close()
