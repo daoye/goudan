@@ -3,8 +3,8 @@
 
 import importlib
 import setting
-from proxy.pipline import Pipline
-from proxy import checker
+from core.pipline import Pipline
+from core import checker
 
 
 def run():
@@ -18,12 +18,11 @@ def run():
     # run spiders
     for name in setting.spiders:
         try:
-            s = __load_cls(name)
-            data = s().run()
+            cls = __load_cls(name)
+            data = cls().run()
             if data:
                 pipline.input(data)
-        except Exception as e:
-            raise e
+        except Exception:
             print('spider [%s], run failed.' % name)
             pass
 

@@ -12,7 +12,10 @@ class Pipline():
     def input(self, data):
         '''向管道输入数据'''
         for m in self.__middlewares:
-            m.input(data)
+            try:
+                m.input(data)
+            except Exception as e:
+                print(e)
 
     def register(self, middleware):
         '''向管道中注册中间件'''

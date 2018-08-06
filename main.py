@@ -1,27 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from proxy import dispatcher
+from core import dispatcher, rproxy
 from threading import Thread
-from proxy import rproxy
 import time
+import sys
+import setting
 
 
-def runProxyDispatcher():
+def run_dispatcher():
+    print('Spiders are running...')
     while True:
         dispatcher.run()
-        time.sleep(10 * 60 * 1000)
-
-
-def runTunnel():
-    rproxy.start()
+        time.sleep(5 * 60 * 1000)
 
 
 if __name__ == '__main__':
-    proxThread = Thread(target=runProxyDispatcher)
-    # proxThread.daemon = True
-    proxThread.start()
-    print('proxy spider started.')
+    if len(sys.argv) > 1:
+        setting.proxy_type = sys.argv[1]
+    try:
+        d_thread = Thread(target=run_dispatcher, daemon=True)
+        d_thread.start()
+    except InterruptedError:
+        pass
 
-    tunnelThread = Thread(target=runTunnel)
-    tunnelThread.run()
+    rproxy.start()
