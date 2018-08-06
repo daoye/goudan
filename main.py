@@ -3,7 +3,7 @@
 
 from proxy import dispatcher
 from threading import Thread
-import rproxy
+from proxy import rproxy
 import time
 
 
