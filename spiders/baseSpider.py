@@ -15,12 +15,18 @@ class BaseSpider():
 
     def __init__(self):
         self.urls = []
+        self.next= None
         self.loop = asyncio.get_event_loop()
 
     def run(self):
         results = []
         tasks = [self._feth(results, u) for u in self.urls]
         self.loop.run_until_complete(asyncio.gather(*tasks))
+
+        while self.next:
+            next_url = self.next
+            self.next = None
+            self.loop.run_until_complete(self._feth(results, next_url))
 
         return results
 
