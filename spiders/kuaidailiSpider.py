@@ -10,8 +10,7 @@ from spiders.baseSpider import BaseSpider
 
 
 class KuaidailiSpider(BaseSpider):
-    '''爬取快代理'''
-
+    
     def __init__(self):
         BaseSpider.__init__(self)
         self.urls = [

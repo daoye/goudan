@@ -3,13 +3,12 @@
 
 import asyncio
 import aiohttp
-
 from lxml import etree
-
 from spiders.baseSpider import BaseSpider
 
 
 class Data5uSpider(BaseSpider):
+
     def __init__(self):
         BaseSpider.__init__(self)
         self.urls = [
