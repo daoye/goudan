@@ -69,7 +69,7 @@ def start():
     coro = loop.create_server(lambda: ServerProtocol(loop), setting.server_host, setting.server_port)
     server = loop.run_until_complete(coro)
 
-    print('Tunnel server on: %s:%s' % (setting.server_host, setting.server_port))
+    print('Tunnel server on: %s:%s, but you must wait one of spiders work done.' % (setting.server_host, setting.server_port))
     try:
         loop.run_forever()
     except KeyboardInterrupt:
