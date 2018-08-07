@@ -5,7 +5,9 @@
 spiders = [
     # 'spiders.localSpider.LocalSpider',
     # 'spiders.xcspider.XcSpider',
-    'spiders.kuaidailiSpider.KuaidailiSpider'
+    # 'spiders.kuaidailiSpider.KuaidailiSpider'
+    'spiders.freeHTTPSpider.FreeHTTPSpider',
+    # 'spiders.freeHTTPSSpider.FreeHTTPSSpider'
 ]
 
 # 指定中间件，中间件将按顺序被执行

@@ -62,6 +62,7 @@ class ProxyProtocol(asyncio.Protocol):
 
     def connection_lost(self, exc):
         self.connected = False
+        self.server.close()
 
 
 def start():
