@@ -4,48 +4,60 @@
 import asyncio
 from core.samplePool import SamplePool
 import setting
+import socket
 
 
 class ServerProtocol(asyncio.Protocol):
     def __init__(self, loop):
         self.loop = loop
-        proxy = SamplePool().get()
-        if not proxy:
-            self.no_proxy = True
-            print('池中没有代理，请等待代理池刷新.')
-            return None
-        self.no_proxy = False
-        self.proxy_ip = proxy['host']
-        self.proxy_port = proxy['port']
+        self.pool = SamplePool()
         self.clients = {}
+        self.closed = False
 
     def connection_made(self, transport):
-        if self.no_proxy:
-            transport.close()
-            return
         self.peername = transport.get_extra_info('peername')
         self.transport = transport
 
     def data_received(self, data):
         asyncio.Task(self.task_send(data))
 
-    @asyncio.coroutine
-    def task_send(self, data):
+    # @asyncio.coroutine
+    async def task_send(self, data):
+        client = await self.connect_to_proxy()
+        if not client:
+            self.transport.close()
+        else:
+            client.transport.write(data)
+
+    async def connect_to_proxy(self):
         client = self.clients.get(self.peername)
-        if not client or not client.connected:
-            _, proxy_protocol = yield from self.loop.create_connection(lambda:  ProxyProtocol(self.transport), self.proxy_ip, self.proxy_port)
-            self.clients[self.peername] = proxy_protocol
-            client = proxy_protocol
-        client.transport.write(data)
+        if client and client.connected:
+            return client
+
+        while not self.closed:
+            try:
+                proxy = self.pool.get_one()
+                if proxy:
+                    _, proxy_protocol = await self.loop.create_connection(lambda:  ProxyProtocol(self.transport), proxy['host'], proxy['port'])
+                    self.clients[self.peername] = proxy_protocol
+                    return proxy_protocol
+                else:
+                    self.transport.close()
+                    print('No have alive proxy!')
+                    return None
+            except Exception as e:
+                print(e)
+
+            return None
 
     def connection_lost(self, exc):
-        if not self.no_proxy:
-            for x in self.clients.values():
-                try:
-                    if x.connected:
-                        x.transport.close()
-                except:
-                    pass
+        self.closed = True
+        for x in self.clients.values():
+            try:
+                if x.connected:
+                    x.transport.close()
+            except:
+                pass
 
 
 class ProxyProtocol(asyncio.Protocol):
@@ -67,10 +79,12 @@ class ProxyProtocol(asyncio.Protocol):
 
 def start():
     loop = asyncio.get_event_loop()
-    coro = loop.create_server(lambda: ServerProtocol(loop), setting.server_host, setting.server_port)
+    coro = loop.create_server(lambda: ServerProtocol(
+        loop), setting.server_host, setting.server_port)
     server = loop.run_until_complete(coro)
 
-    print('Tunnel server on: %s:%s, but you must wait one of spiders work done.' % (setting.server_host, setting.server_port))
+    print('Tunnel server on: %s:%s, but you must wait one of spiders work done.' % (
+        setting.server_host, setting.server_port))
     try:
         loop.run_forever()
     except KeyboardInterrupt:

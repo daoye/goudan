@@ -10,7 +10,7 @@ class SamplePool():
     def __init__(self):
         self.__pool = []
 
-    def get(self):
+    def get_one(self):
         total = len(self.__pool)
         if not total:
             return None
@@ -25,8 +25,5 @@ class SamplePool():
         if item in self.__pool:
             self.__pool.remove(item)
 
-    def _set_pool(self, items):
-        self.__pool = items
-
-    def _get_pool(self):
+    def get_pool(self):
         return self.__pool

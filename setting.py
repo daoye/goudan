@@ -6,18 +6,19 @@ spiders = [
     # 'spiders.localSpider.LocalSpider',
     # 'spiders.xcspider.XcSpider',
     # 'spiders.kuaidailiSpider.KuaidailiSpider'
-    'spiders.freeHTTPSpider.FreeHTTPSpider',
-    # 'spiders.freeHTTPSSpider.FreeHTTPSSpider'
+    # 'spiders.freeHTTPSpider.FreeHTTPSpider',
+    'spiders.freeHTTPSSpider.FreeHTTPSSpider'
 ]
 
 # 指定中间件，中间件将按顺序被执行
 pipeline_middlewares = [
-    'middlewares.checkerMiddleware.CheckerMiddleware',
-    'middlewares.poolMiddleware.PoolMiddleware'
+    # 'middlewares.fragmentMiddleware.FragmentMiddleware',
+    'middlewares.validMiddleware.ValidMiddleware',
+    # 'middlewares.poolMiddleware.PoolMiddleware'
 ]
 
 # 指定支持的代理类型，同时只能支持一种类型，可选值有：http、https、socks
-proxy_type = 'http'
+proxy_type = 'https'
 
 # 指定隧道代理的地址
 server_host = '0.0.0.0'

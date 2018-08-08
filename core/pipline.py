@@ -13,7 +13,9 @@ class Pipline():
         '''向管道输入数据'''
         for m in self.__middlewares:
             try:
-                m.input(data)
+                data = m.input(data)
+                if not data:
+                    break
             except Exception as e:
                 print(e)
 

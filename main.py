@@ -14,15 +14,10 @@ def run_dispatcher():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     _dispatcher = dispatcher.Dispatcher()
-
-    while True:
-        print('[%s] Spiders are running now...' % datetime.datetime.now())
-        _dispatcher.run()
-        print('[%s] Spiders run complete!' % datetime.datetime.now())
-        time.sleep(5*60)
+    _dispatcher.run()
 
 
-def _info():
+def info():
     print('Example: python main.py -tsocks -l0.0.0.0 -p1991 -shttp://localhost:1087')
     print('-t   [http,https,socks]')
     print('-l   Tunnel host, default is "0.0.0.0"')
@@ -46,11 +41,10 @@ if __name__ == '__main__':
                     print('invalid argument: %s' % arg)
                     sys.exit(0)
         except:
-            _info()
+            info()
             sys.exit(0)
     try:
-        d_thread = Thread(target=run_dispatcher,
-                          daemon=True, name="dispatcher")
+        d_thread = Thread(target=run_dispatcher, daemon=True)
         d_thread.start()
     except InterruptedError:
         pass
