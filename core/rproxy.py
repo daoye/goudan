@@ -5,91 +5,90 @@ import asyncio
 from core.samplePool import SamplePool
 import setting
 import socket
+import functools
 
 
-class ServerProtocol(asyncio.Protocol):
-    def __init__(self, loop):
-        self.loop = loop
-        self.pool = SamplePool()
-        self.clients = {}
-        self.closed = False
+async def process(s_client, client_addr, loop, pool):
+    print('client %s:%s conneccted' % client_addr)
+    s_remote = socket.socket()
+    s_remote.setblocking(False)
+    s_remote.settimeout(2)
+    retry = 5
+    success = False
+    remote_addr = None
+    while retry:
+        try:
+            proxy = pool.get_one()
+            if not proxy:
+                break
+            remote_addr = (proxy['host'], proxy['port'])
+            await loop.sock_connect(s_remote, remote_addr)
+            print('proxy %s:%s connected!' % remote_addr)
+            success = True
+            break
+        except:
+            retry -= 1
 
-    def connection_made(self, transport):
-        self.peername = transport.get_extra_info('peername')
-        self.transport = transport
+    if not success:
+        s_client.close()
+        return
 
-    def data_received(self, data):
-        asyncio.Task(self.task_send(data))
-
-    # @asyncio.coroutine
-    async def task_send(self, data):
-        client = await self.connect_to_proxy()
-        if not client:
-            self.transport.close()
-        else:
-            client.transport.write(data)
-
-    async def connect_to_proxy(self):
-        client = self.clients.get(self.peername)
-        if client and client.connected:
-            return client
-
-        while not self.closed:
-            try:
-                proxy = self.pool.get_one()
-                if proxy:
-                    _, proxy_protocol = await self.loop.create_connection(lambda:  ProxyProtocol(self.transport), proxy['host'], proxy['port'])
-                    self.clients[self.peername] = proxy_protocol
-                    return proxy_protocol
-                else:
-                    self.transport.close()
-                    print('No have alive proxy!')
-                    return None
-            except Exception as e:
-                print(e)
-
-            return None
-
-    def connection_lost(self, exc):
-        self.closed = True
-        for x in self.clients.values():
-            try:
-                if x.connected:
-                    x.transport.close()
-            except:
-                pass
+    loop.add_reader(s_client, functools.partial(forward, loop, s_client, s_remote, client_addr, remote_addr))
+    loop.add_reader(s_remote, functools.partial(forward, loop, s_remote, s_client, client_addr, remote_addr))
 
 
-class ProxyProtocol(asyncio.Protocol):
-    def __init__(self, server):
-        self.server = server
-        self.connected = False
+def forward(loop, r, w, client_addr, remote_addr):
+    try:
+        data = r.recv(1024)
+        if data:
+            loop.call_soon(w.sendall, data)
+            return
+    except Exception as e:
+        print(e)
+        pass
 
-    def connection_made(self, transport):
-        self.transport = transport
-        self.connected = True
+    try:
+        r.shutdown(socket.SHUT_RDWR)
+        r.close()
+    except:
+        pass
+    try:
+        w.shutdown(socket.SHUT_RDWR)
+        w.close()
+    except:
+        pass
+    loop.remove_reader(r)
+    loop.remove_reader(w)
 
-    def data_received(self, data):
-        self.server.write(data)
+    print('%s:%s disconnected!' % client_addr)
+    print('%s:%s disconnected!' % remote_addr)
 
-    def connection_lost(self, exc):
-        self.connected = False
-        self.server.close()
 
 
 def start():
     loop = asyncio.get_event_loop()
-    coro = loop.create_server(lambda: ServerProtocol(
-        loop), setting.server_host, setting.server_port)
-    server = loop.run_until_complete(coro)
+    pool = SamplePool()
 
-    print('Tunnel server on: %s:%s, but you must wait one of spiders work done.' % (
-        setting.server_host, setting.server_port))
+    addr = (setting.server_host, setting.server_port)
+    sock = socket.socket()
+    sock.bind(addr)
+    sock.listen(1)
+    sock.setblocking(False)
+    print('Tunnel server on: %s:%s, but you must wait one of spiders work done.' % addr)
+
     try:
-        loop.run_forever()
+        while True:
+            s_client, client_addr = loop.run_until_complete(loop.sock_accept(sock))
+            asyncio.Task(process(s_client, client_addr, loop, pool))
     except KeyboardInterrupt:
         pass
+    except Exception as e:
+        print(e)
 
-    server.close()
-    loop.run_until_complete(server.wait_closed())
+    try:
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
+    except:
+        pass
+
     loop.close()

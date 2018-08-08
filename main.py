@@ -23,6 +23,7 @@ def info():
     print('-l   Tunnel host, default is "0.0.0.0"')
     print('-p   Tunnel port, default is "1991"')
     print('-s   Spider proxy address, for example: http://localhost:1087, default is None')
+    print('-tt   Test proxy timeout default is 5')
 
 
 if __name__ == '__main__':
@@ -37,6 +38,8 @@ if __name__ == '__main__':
                     setting.server_port = int(arg.replace('-p', ''))
                 elif arg.startswith('-s'):
                     setting.spider_proxy = arg.replace('-s', '')
+                elif arg.startswith('-tt'):
+                    setting.test_timeout = int(arg.replace('-tt', ''))
                 else:
                     print('invalid argument: %s' % arg)
                     sys.exit(0)
