@@ -7,9 +7,9 @@ import random
 import aiohttp
 from lxml import etree
 
-from data import userAgent
+from data import agents
 import setting
-
+import logging
 
 class BaseSpider():
 
@@ -19,6 +19,7 @@ class BaseSpider():
         self.loop = asyncio.get_event_loop()
 
     def run(self):
+        logging.debug("Running spider [%s] now!" % (type(self).__name__))
         results = []
         tasks = [self._feth(results, u) for u in self.urls]
         self.loop.run_until_complete(asyncio.gather(*tasks))
@@ -31,10 +32,11 @@ class BaseSpider():
         return results
 
     def _headers(self):
-        number = random.randint(0, len(userAgent.agents)-1)
-        return {'user-agent': userAgent.agents[number]}
+        number = random.randint(0, len(agents)-1)
+        return {'user-agent': agents[number]}
 
     async def _feth(self, results, url):
+        logging.debug("Fetching page [%s] by spider [%s]." % (url, type(self).__name__))
         try:
             html = None
             async with aiohttp.ClientSession() as session:
@@ -44,7 +46,7 @@ class BaseSpider():
             self._parse(results, html)
 
         except Exception as e:
-            print(e)
+            logging.error("Fetch page error:%s by spider [%s]" % (e, type(self).__name__))
 
     def _parse(self, results, text):
         pass

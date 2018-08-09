@@ -4,7 +4,7 @@
 
 from lxml import etree
 from spiders.baseSpider import BaseSpider
-
+import logging
 
 class XiciSpider(BaseSpider):
     def __init__(self):
@@ -31,4 +31,4 @@ class XiciSpider(BaseSpider):
                     'location': 'cn'
                 })
             except:
-                pass
+                logging.error("XiciSpider error:%s" % e)

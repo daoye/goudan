@@ -4,7 +4,7 @@
 
 from spiders.baseSpider import BaseSpider
 import json
-
+import logging
 
 class FreeHTTPSpider(BaseSpider):
     '''data from https://github.com/jiangxianli/ProxyIpLib'''
@@ -31,4 +31,4 @@ class FreeHTTPSpider(BaseSpider):
                 
             self.next = data.get('next_page_url')
         except Exception as e:
-            print(e)
+            logging.error("FreeHTTPSpider error:%s" % e)

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import random
-from core.utils import singleton
+from core import singleton
 
 
 @singleton

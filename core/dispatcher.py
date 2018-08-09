@@ -3,9 +3,10 @@
 
 import setting
 from core.pipline import Pipline
-from core.samplePool import SamplePool
+from data.samplePool import SamplePool
 import datetime
 import time
+import logging
 
 
 class Dispatcher():
@@ -13,8 +14,7 @@ class Dispatcher():
         self.pipline = Pipline()
 
         # load middlewares
-        [self.pipline.register(self.__load(name)())
-         for name in setting.pipeline_middlewares]
+        [self.pipline.register(self.__load(name)()) for name in setting.pipeline_middlewares]
 
         # load  spiders
         self.spiders = [self.__load(name)() for name in setting.spiders]
@@ -26,12 +26,12 @@ class Dispatcher():
             try:
                 data = spider.run()
             except Exception as e:
-                print('spider failed:%s' % (e))
+                logging.error('Spider [%s] failed: %s' % (type(spider).__name__, e))
 
-            if data and len(data):
+            if data:
                     self.pipline.input(data)
-            else:
-                print('No have proxies.')
+
+            logging.debug('Spider [%s] was get %s proxies.' % (type(spider).__name__, len(data)))
 
     def __valid_pool(self):
         pool = SamplePool()
@@ -46,12 +46,12 @@ class Dispatcher():
 
     def run(self):
         while True:
-            print('[%s] Spiders are running now...' % datetime.datetime.now())
+            logging.debug('Spiders are running now...')
             self.__run_spider()
-            print('[%s] Spiders run complete!' % datetime.datetime.now())
+            logging.debug('Spiders run complete!' )
 
             time.sleep(5*60)
 
-            print('[%s] Valid proxy from pool now...' %  datetime.datetime.now())
+            logging.debug('Valid proxies from pool now...')
             self.__valid_pool()
-            print('[%s] Pool proxy valid complete!' % datetime.datetime.now())
+            logging.debug('Pool proxies valid complete!')

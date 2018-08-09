@@ -3,11 +3,10 @@
 
 from core import dispatcher, rproxy
 from threading import Thread
-import time
 import sys
 import setting
 import asyncio
-import datetime
+import logging
 
 
 def run_dispatcher():
@@ -46,6 +45,9 @@ if __name__ == '__main__':
         except:
             info()
             sys.exit(0)
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.getLogger("urllib3").setLevel(logging.FATAL)
     try:
         d_thread = Thread(target=run_dispatcher, daemon=True)
         d_thread.start()

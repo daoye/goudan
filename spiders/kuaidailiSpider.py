@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import asyncio
-import aiohttp
-
 from lxml import etree
-
 from spiders.baseSpider import BaseSpider
+import logging
 
 
 class KuaidailiSpider(BaseSpider):
@@ -30,4 +27,4 @@ class KuaidailiSpider(BaseSpider):
                     'loc': 'cn'
                 })
         except Exception as e:
-            print(e)
+            logging.error("KuaidailiSpider error:%s" % e)

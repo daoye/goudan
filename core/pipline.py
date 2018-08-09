@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from core.utils import singleton
-
+from core import singleton
+import logging
 
 @singleton
 class Pipline():
@@ -10,15 +10,14 @@ class Pipline():
         self.__middlewares = []
 
     def input(self, data):
-        '''向管道输入数据'''
         for m in self.__middlewares:
             try:
                 data = m.input(data)
                 if not data:
                     break
             except Exception as e:
-                print(e)
+                logging.error("Input data failed: %s" % e)
 
     def register(self, middleware):
-        '''向管道中注册中间件'''
         self.__middlewares.append(middleware)
+        logging.debug('Middleware [%s] registered!' % (type(middleware).__name__))

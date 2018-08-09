@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import asyncio
-from core.samplePool import SamplePool
+from data.samplePool import SamplePool
 import setting
 import socket
 import functools
+import logging
 
 
 async def process(s_client, client_addr, loop, pool):
-    print('client %s:%s conneccted' % client_addr)
+    logging.debug('Client %s:%s conneccted' % client_addr)
     s_remote = socket.socket()
     s_remote.setblocking(False)
     s_remote.settimeout(2)
@@ -23,13 +24,15 @@ async def process(s_client, client_addr, loop, pool):
                 break
             remote_addr = (proxy['host'], proxy['port'])
             await loop.sock_connect(s_remote, remote_addr)
-            print('proxy %s:%s connected!' % remote_addr)
+            logging.debug('Proxy %s:%s connected!' % remote_addr)
             success = True
             break
         except:
+            logging.debug("Proxy connect failed, will retry (retry 5 times).")
             retry -= 1
 
     if not success:
+        logging.info("Retry multiple times, but can't connect any one proxy.")
         s_client.close()
         return
 
@@ -44,8 +47,7 @@ def forward(loop, r, w, client_addr, remote_addr):
             loop.call_soon(w.sendall, data)
             return
     except Exception as e:
-        print(e)
-        pass
+        logging.debug("Recive data error:%s" % e)
 
     try:
         r.shutdown(socket.SHUT_RDWR)
@@ -60,8 +62,8 @@ def forward(loop, r, w, client_addr, remote_addr):
     loop.remove_reader(r)
     loop.remove_reader(w)
 
-    print('%s:%s disconnected!' % client_addr)
-    print('%s:%s disconnected!' % remote_addr)
+    logging.debug('%s:%s disconnected!' % client_addr)
+    logging.debug('%s:%s disconnected!' % remote_addr)
 
 
 
@@ -74,7 +76,7 @@ def start():
     sock.bind(addr)
     sock.listen(1)
     sock.setblocking(False)
-    print('Tunnel server on: %s:%s, but you must wait one of spiders work done.' % addr)
+    logging.info('Tunnel server on: %s:%s, but you must wait one of spiders work done.' % addr)
 
     try:
         while True:
@@ -83,7 +85,7 @@ def start():
     except KeyboardInterrupt:
         pass
     except Exception as e:
-        print(e)
+        logging.error("Accept client error: %s" % e)
 
     try:
         sock.shutdown(socket.SHUT_RDWR)

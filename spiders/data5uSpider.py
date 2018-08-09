@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import asyncio
-import aiohttp
 from lxml import etree
 from spiders.baseSpider import BaseSpider
-
+import logging
 
 class Data5uSpider(BaseSpider):
 
@@ -33,4 +31,4 @@ class Data5uSpider(BaseSpider):
                     'loc': 'cn'
                 })
         except Exception as e:
-            print(e)
+            logging.error("Data5uSpider error:%s" % e)
