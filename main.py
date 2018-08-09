@@ -18,7 +18,7 @@ def run_dispatcher():
 
 
 def parse_args():
-    info = '''Goudan is a tunnel proxy, it's support all tcp proxy(theoretically), such as http,https,socks.
+    info = '''Goudan(狗蛋)is a tunnel proxy, it's support all tcp proxy(theoretically), such as http,https,socks.
 By default, goudan crawl free proxies from some websites. So, you can use it out of box.
 For more information visit: https://github.com/daoye/goudan
     '''
