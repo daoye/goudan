@@ -14,7 +14,7 @@ async def process(s_client, client_addr, loop, pool):
     s_remote = socket.socket()
     s_remote.setblocking(False)
     s_remote.settimeout(2)
-    retry = 5
+    retry = setting.proxy_retry
     success = False
     remote_addr = None
     while retry:
@@ -28,7 +28,7 @@ async def process(s_client, client_addr, loop, pool):
             success = True
             break
         except:
-            logging.debug("Proxy connect failed, will retry (retry 5 times).")
+            logging.debug("Proxy connect failed, will retry (retry %s times)." % retry)
             retry -= 1
 
     if not success:
