@@ -26,11 +26,13 @@ For more information visit: https://github.com/daoye/goudan
     parser.add_argument('-r', '--retry', type=int, default=5,
                         help="If proxy host connect failed, goudan will retry use another proxy. This argument tell goudan number of retries, default is 5.")
     parser.add_argument('-t', '--type', type=str, choices=['http', 'https', 'http/https', 'socks'], default="http/https",
-                        help="Set tunnel proxy's type. The optional values are http,https,http/https/socks, default is http/https.")
+                        help="Set tunnel proxy's type. The optional values are http,https,http/https,socks, default is http/https.")
     parser.add_argument('-l', '--host', type=str, default="0.0.0.0",
                         help="Set tunnel proxy's host. It is an ip address, default is 0.0.0.0.")
     parser.add_argument('-p', '--port', type=int, default=1991,
                         help="Set tunnel proxy's port. It is a number(0~65535), default is 1991.")
+    parser.add_argument('-i', '--idle_time', type=int, default=5,
+                        help="Set spider's idle time, default is 5, unit:minutes.")
     parser.add_argument('--spider_proxy', type=str,
                         help="Set the spider's proxy, like this: http://127.0.0.1:1080")
     parser.add_argument('--test_timeout', type=int, default=10,
@@ -44,6 +46,7 @@ For more information visit: https://github.com/daoye/goudan
     setting.server_port = args.port
     setting.spider_proxy = args.spider_proxy
     setting.test_timeout = args.test_timeout
+    setting.idle_time = args.idle_time
     setting.log_level = args.log_level
 
 

@@ -50,7 +50,7 @@ class Dispatcher():
             self.__run_spider()
             logging.debug('Spiders run complete!' )
 
-            time.sleep(5*60)
+            time.sleep(setting.idle_time * 60)
 
             logging.debug('Valid proxies from pool now...')
             self.__valid_pool()
