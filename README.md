@@ -11,7 +11,7 @@ So, I must change my IP to crawl it at a moment.
 
 The best way is set a proxy address for a web requests libray, such as "Requests","urlib", "aiohttp" and so on.
 
-But, I need write those code in every project. I want't to do this.
+But, I need write those code in every project. And I want't to do this.
 
 This why I start this project.
 
@@ -44,7 +44,7 @@ cd goudan
 python3 main.py
 ```
 
-The best way is use virtualenv.
+__The best way is use virtualenv.__
 
 ## Add your proxies
 
@@ -98,19 +98,19 @@ class MySpider(BaseSpider):
             })
 ```
 
-A proxy is a dictionary, it has these key:
+A proxy item is a dictionary, it has these key:
 
-host: The ip address.
+    host: The ip address.
 
-port: The port, __it must an integer__.
+    port: The port, __it must an integer__.
 
-type: The proxy's type, it can be: __http,https,http/https,socks__ .
+    type: The proxy's type, it can be: __http,https,http/https,socks__ .
 
-loc:   Location of proxy(not imoprtant, use for feature) .
+    loc:   Location of proxy(not imoprtant, use for feature) .
 
-__When you create a spider, you must add it to the "setting.py"__
+__When you create a spider, you must modify the "setting.py"__
 
-Open file "setting.py",  then find the "spiders" variable, add you spider in it:
+Open  the file "setting.py",  then find the "spiders" variable, add you spider in it:
 
 ```python
 spiders = [
@@ -123,3 +123,7 @@ spiders = [
 ## The end
 
 Enjoy!
+
+## License
+
+MIT
