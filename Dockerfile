@@ -6,8 +6,8 @@ EXPOSE 1991
 WORKDIR /app
 ADD ./src /app
 
-RUN apk add --no-cache gcc musl-dev libxslt-dev  --virtual .build-deps\
+RUN apk add --no-cache gcc  --virtual .build-deps\
+        && apk add --no-cache musl-dev libxslt-dev\
         && python3 -m pip install -r requirements.txt \
         && apk del .build-deps
-# CMD ["python3", "-m", "goudan"]
 ENTRYPOINT [ "python3", "main.py"]
