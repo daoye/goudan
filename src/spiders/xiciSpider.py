@@ -28,7 +28,7 @@ class XiciSpider(BaseSpider):
                     'host': r[1].text,
                     'port': int(r[2].text),
                     'type': ptype if ptype != 'socks4/5' else 'socks',
-                    'location': 'cn'
+                    'loc': 'cn'
                 })
             except:
                 logging.error("XiciSpider error:%s" % e)
