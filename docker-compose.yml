@@ -6,3 +6,4 @@ services:
     build: .
     ports:
       - 1991:1991
+    restart: always

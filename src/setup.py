@@ -12,7 +12,7 @@ By default, goudan crawl free proxies from some websites. So, you can use it out
 For more information visit: https://github.com/daoye/goudan
     '''
     ),
-    long_description=open('README.md').read(),
+    long_description=open('../README.md').read(),
     author='daoye',
     author_email='daoye.more@outlook.com',
     maintainer='daoye',
