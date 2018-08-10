@@ -100,13 +100,13 @@ class MySpider(BaseSpider):
 
 A proxy item is a dictionary, it has these key:
 
-    host: The ip address.
+> host: The ip address.
 
-    port: The port, __it must an integer__.
+> port: The port, __it must an integer__.
 
-    type: The proxy's type, it can be: __http,https,http/https,socks__ .
+> type: The proxy's type, it can be: __http, https, http/https,socks__.
 
-    loc:   Location of proxy(not imoprtant, use for feature) .
+> loc:   Location of proxy(not imoprtant, use for feature).
 
 __When you create a spider, you must modify the "setting.py"__
 
