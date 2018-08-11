@@ -18,7 +18,7 @@ For more information visit: https://github.com/daoye/goudan
     maintainer='daoye',
     maintainer_email='daoye.more@outlook.com',
     license='MIT License',
-    packages=find_packages(),
+    # packages=find_packages(),
     platforms=["all"],
     url='https://github.com/daoye/goudan',
     classifiers=[
@@ -27,7 +27,8 @@ For more information visit: https://github.com/daoye/goudan
     ],
     install_requires=[
         "aiohttp==3.3.2",
-        "python3-lxml==4.2.4",
+        "lxml==4.2.4",
         "urllib3==1.23"
-    ]
+    ],
+    py_modules=['goudan']
 )

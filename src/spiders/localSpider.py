@@ -3,6 +3,9 @@
 
 
 class LocalSpider():
+    def __init__(self):
+        self.idle = 10
+        
     def run(self):
         return [
             {"host": "127.0.0.1", 'port': 1080, 'type': 'socks', 'loc': 'jp'},

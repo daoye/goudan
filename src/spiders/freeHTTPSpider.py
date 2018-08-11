@@ -12,6 +12,7 @@ class FreeHTTPSpider(BaseSpider):
     def __init__(self):
         BaseSpider.__init__(self)
         self.urls = ['http://ip.jiangxianli.com/api/proxy_ips']
+        self.idle = 60 * 30 # idle 30 miniutes.
 
     def _parse(self, results, text):
         try:

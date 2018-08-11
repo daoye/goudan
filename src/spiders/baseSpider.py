@@ -17,6 +17,7 @@ class BaseSpider():
         self.urls = []
         self.next= None
         self.loop = asyncio.get_event_loop()
+        self.idle = 5
 
     def run(self):
         logging.debug("Running spider [%s] now!" % (type(self).__name__))

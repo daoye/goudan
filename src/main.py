@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 from core import dispatcher, rproxy
 from threading import Thread
 import sys
@@ -31,8 +32,8 @@ For more information visit: https://github.com/daoye/goudan
                         help="Set tunnel proxy's host. It is an ip address, default is 0.0.0.0.")
     parser.add_argument('-p', '--port', type=int, default=1991,
                         help="Set tunnel proxy's port. It is a number(0~65535), default is 1991.")
-    parser.add_argument('-i', '--idle_time', type=int, default=5,
-                        help="Set spider's idle time, default is 5, unit:minutes.")
+    parser.add_argument('-i', '--idle_time', type=int, default=1,
+                        help="Set dispatcher's idle time, default is 1, unit:minutes.")
     parser.add_argument('--spider_proxy', type=str,
                         help="Set the spider's proxy, like this: http://127.0.0.1:1080")
     parser.add_argument('--test_timeout', type=int, default=10,
@@ -52,7 +53,8 @@ For more information visit: https://github.com/daoye/goudan
 
 if __name__ == '__main__':
     parse_args()
-    logging.basicConfig(level=setting.log_level, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(level=setting.log_level,
+                        format="%(asctime)s - %(levelname)s - %(message)s")
     logging.getLogger("urllib3").setLevel(logging.FATAL)
     try:
         d_thread = Thread(target=run_dispatcher, daemon=True)

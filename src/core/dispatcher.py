@@ -12,9 +12,11 @@ import logging
 class Dispatcher():
     def __init__(self):
         self.pipline = Pipline()
+        self.histories = {}
 
         # load middlewares
-        [self.pipline.register(self.__load(name)()) for name in setting.pipeline_middlewares]
+        [self.pipline.register(self.__load(name)())
+         for name in setting.pipeline_middlewares]
 
         # load  spiders
         self.spiders = [self.__load(name)() for name in setting.spiders]
@@ -22,16 +24,32 @@ class Dispatcher():
     def __run_spider(self):
         # run spiders
         for spider in self.spiders:
+            if not self.__need_run(spider):
+                continue
             data = None
             try:
                 data = spider.run()
+                self.histories[type(spider).__name__] = datetime.datetime.now()
             except Exception as e:
-                logging.error('Spider [%s] failed: %s' % (type(spider).__name__, e))
+                logging.error('Spider [%s] failed: %s' %
+                              (type(spider).__name__, e))
+
+            logging.debug('Spider [%s] was get %s proxies.' %
+                          (type(spider).__name__, len(data)))
 
             if data:
-                    self.pipline.input(data)
+                self.pipline.input(data)
 
-            logging.debug('Spider [%s] was get %s proxies.' % (type(spider).__name__, len(data)))
+    def __need_run(self, spider):
+        if type(spider).__name__ in self.histories:
+            if not hasattr(spider, 'idle'):
+                return False
+            if spider.idle <= 0:
+                return False
+            last_time = self.histories.get(type(spider).__name__)
+            if (datetime.datetime.now() - last_time).seconds <= spider.idle:
+                return False
+        return True
 
     def __valid_pool(self):
         pool = SamplePool()
@@ -48,7 +66,7 @@ class Dispatcher():
         while True:
             logging.debug('Spiders are running now...')
             self.__run_spider()
-            logging.debug('Spiders run complete!' )
+            logging.debug('Spiders run complete!')
 
             time.sleep(setting.idle_time * 60)
 

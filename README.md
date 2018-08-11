@@ -48,7 +48,7 @@ __The best way is use virtualenv.__
 
 ## Add your proxies
 
-If you have some other proxies, you can add them  to the proxy pool.
+If you have some other proxies, you can add them to the proxy pool.
 
 To do this, you must create a new spider. For example:
 
@@ -81,9 +81,14 @@ import logging
 class MySpider(BaseSpider):
     def __init__(self):
         BaseSpider.__init__(self)
+
+        # This are target urls.
         self.urls = [
             'http://www.xxx.xxx/'
         ]
+
+        # This means crawl per 10 minutes.
+        self.idle = 10 * 60 
 
     def _parse(self, results, text):
         # parse the result
@@ -126,4 +131,4 @@ Enjoy!
 
 ## License
 
-MIT
+MIT License

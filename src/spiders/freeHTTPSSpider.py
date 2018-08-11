@@ -11,6 +11,7 @@ class FreeHTTPSSpider(BaseSpider):
     def __init__(self):
         BaseSpider.__init__(self)
         self.urls = ['https://31f.cn/https-proxy/']
+        self.idle = 10 * 60 #idle 10 miniutes
 
     def _parse(self, results, text):
         try:

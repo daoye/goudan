@@ -35,7 +35,7 @@ spider_proxy = None
 test_timeout = 10
 
 # 爬虫完成一轮爬取后，进行下一轮爬取需要间隔的时间，单位：分
-idle_time = 5
+idle_time = 1
 
 # 日志级别
 # --log_level=20

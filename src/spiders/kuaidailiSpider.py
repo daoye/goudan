@@ -11,7 +11,8 @@ class KuaidailiSpider(BaseSpider):
     def __init__(self):
         BaseSpider.__init__(self)
         self.urls = [
-            'https://www.kuaidaili.com/free/inha/%s/' % (i) for i in range(1, 101)]
+            'https://www.kuaidaili.com/free/inha/%s/' % (i) for i in range(1, 50)]
+        self.idle = 10 * 60 #idle 10 minutes.
 
     def _parse(self, results, text):
         try:
