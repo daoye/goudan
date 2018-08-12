@@ -10,7 +10,7 @@ import logging
 
 
 async def process(s_client, client_addr, loop, pool):
-    logging.debug('Client %s:%s conneccted' % client_addr)
+    logging.debug('Client %s:%s connected' % client_addr)
     s_remote = socket.socket()
     s_remote.setblocking(False)
     s_remote.settimeout(2)

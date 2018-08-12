@@ -82,7 +82,7 @@ class MySpider(BaseSpider):
     def __init__(self):
         BaseSpider.__init__(self)
 
-        # This are target urls.
+        # These are target urls.
         self.urls = [
             'http://www.xxx.xxx/'
         ]
@@ -91,7 +91,7 @@ class MySpider(BaseSpider):
         self.idle = 10 * 60 
 
     def _parse(self, results, text):
-        # parse the result
+        # parse the "text"
         # then add it to "results"
 
         for r in rows:
@@ -115,12 +115,11 @@ A proxy item is a dictionary, it has these key:
 
 __When you create a spider, you must modify the "setting.py"__
 
-Open  the file "setting.py",  then find the "spiders" variable, add you spider in it:
+Open the file "setting.py", then find the "spiders" variable, add you spider in it:
 
 ```python
 spiders = [
-    ......
-
+    ...
     'spiders.mySpider.MySpider'  # This is you spider.
 ]
 ```

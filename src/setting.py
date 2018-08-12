@@ -3,12 +3,13 @@
 
 # 指定用于获取代理ip的爬虫
 spiders = [
-    # 'spiders.localSpider.LocalSpider',
+    'spiders.localSpider.LocalSpider',
     'spiders.freeHTTPSpider.FreeHTTPSpider',
     'spiders.freeHTTPSSpider.FreeHTTPSSpider',
     'spiders.xiciSpider.XiciSpider',
     'spiders.data5uSpider.Data5uSpider',
-    'spiders.kuaidailiSpider.KuaidailiSpider'
+    'spiders.kuaidailiSpider.KuaidailiSpider',
+    'spiders.spysoneSpider.SpysoneSpider'
 ]
 
 # 指定中间件，中间件将按顺序被执行
