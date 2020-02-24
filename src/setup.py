@@ -28,7 +28,7 @@ For more information visit: https://github.com/daoye/goudan
     install_requires=[
         "aiohttp==3.3.2",
         "lxml==4.2.4",
-        "urllib3==1.23"
+        "urllib3==1.24.2"
     ],
     py_modules=['goudan']
 )
