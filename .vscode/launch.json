@@ -11,9 +11,7 @@
             "program": "${file}",
             "args": [
                 "--log_level",
-                "10",
-                "--spider_proxy",
-                "http://127.0.0.1:1087"
+                "10"
             ],
             "cwd": "${workspaceFolder}/src"
         }
