@@ -23,7 +23,7 @@ class ProxyItem(db.Entity):
 class Pool():
     def get(self, protocol):
         with db_session:
-            qer = select(x for x in ProxyItem if x.expired >= datetime.now().timestamp() and x.protocol == protocol and x.isok == True)
+            qer = select(x for x in ProxyItem if x.expired >= datetime.now().timestamp() and protocol in x.supportProtocol and x.isok == True)
             total = qer.count()
             idx = random.randint(0, total-1)
             return qer[idx:idx + 1][0]
