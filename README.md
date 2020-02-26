@@ -20,19 +20,19 @@ This why I start this project.
 ### Use by docker(Recommend)
 
 ```bash
-docker run -p 1991:1991 -d --restart always --name goudan daoye/goudan
+docker run -p 1991:1991 -p 1992:1992 -p 1993:1993 -p 1994:1994 -d --restart always --name goudan daoye/goudan
 ```
 
 or
 
 ```bash
-docker run -p 1991:1991 -d --restart always --name goudan daoye/goudan --log_level 10 -r 10 -i 60 -t socks
+docker run -p 1991:1991 -p 1994:1994 -d --restart always --name goudan daoye/goudan --log_level 10 -r 10 -l http:0.0.0.0:1991,socks5:0.0.0.0:1994
 ```
 
 If you want see some help documents:
 
 ```bash
-docker run daoye/goudan -h
+docker run --rm daoye/goudan -h
 ```
 
 ### From source(need python3.7)
@@ -46,83 +46,10 @@ python3 main.py
 
 __The best way is use virtualenv.__
 
-## Add your proxies
+## Write my plugins
 
-If you have some other proxies, you can add them to the proxy pool.
+Visit: [Goudan_plugins](https://github.com/daoye/goudan_plugins)
 
-To do this, you must create a new spider. For example:
-
-```python
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
-
-
-class MySpider():
-    def run(self):
-        return [
-            {"host": "127.0.0.1", 'port': 1080, 'type': 'socks', 'loc': 'jp'},
-            {"host": "127.0.0.1", 'port': 1087, 'type': 'http', 'loc': 'jp'}
-        ]
-```
-
-This spider return an array include some proxies.
-
-Anyway, you can collect some proxies from other web site:
-
-```python
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-
-from lxml import etree
-from spiders.baseSpider import BaseSpider
-import logging
-
-class MySpider(BaseSpider):
-    def __init__(self):
-        BaseSpider.__init__(self)
-
-        # These are target urls.
-        self.urls = [
-            'http://www.xxx.xxx/'
-        ]
-
-        # This means crawl per 10 minutes.
-        self.idle = 10 * 60 
-
-    def _parse(self, results, text):
-        # parse the "text"
-        # then add it to "results"
-
-        for r in rows:
-            results.append({
-                'host': r.ip,
-                'port': r.port,
-                'type': 'http',
-                'loc': 'cn'
-            })
-```
-
-A proxy item is a dictionary, it has these key:
-
-> host: The ip address.
-
-> port: The port, __it must an integer__.
-
-> type: The proxy's type, it can be: __http, https, http/https,socks__.
-
-> loc:   Location of proxy(not imoprtant, use for feature).
-
-__When you create a spider, you must modify the "setting.py"__
-
-Open the file "setting.py", then find the "spiders" variable, add you spider in it:
-
-```python
-spiders = [
-    ...
-    'spiders.mySpider.MySpider'  # This is you spider.
-]
-```
 
 ## The end
 

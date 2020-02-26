@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+import os
 
 
-def singleton(cls, *args, **kw):
-    instances = {}
 
-    def _singleton():
-        if cls not in instances:
-            instances[cls] = cls(*args, **kw)
-        return instances[cls]
-    return _singleton
+def PATH():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+def FILE(file):
+    return os.path.join(PATH(), file)

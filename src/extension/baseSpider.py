@@ -7,9 +7,11 @@ import random
 import aiohttp
 from lxml import etree
 
-from data import agents
 import setting
 import logging
+from pony.orm import *
+from core.data import ProxyItem
+from datetime import datetime, timedelta
 
 class BaseSpider():
 
@@ -19,7 +21,7 @@ class BaseSpider():
         self.loop = asyncio.get_event_loop()
         self.idle = 5
 
-    def run(self):
+    def start(self, hosting):
         logging.debug("Running spider [%s] now!" % (type(self).__name__))
         results = []
         tasks = [self._feth(results, u) for u in self.urls]
@@ -30,18 +32,26 @@ class BaseSpider():
             self.next = None
             self.loop.run_until_complete(self._feth(results, next_url))
 
-        return results
+        with db_session:
+            expired = int((datetime.now() + timedelta(days=360*10)).timestamp())
+            for r in results:
+                if not exists(x for x in ProxyItem if x.protocol==r['protocol'] and x.host==r['host'] and x.port==r['port']):
+                    ProxyItem(protocol=r['protocol']
+                    , supportProtocol=r['supportProtocol']
+                    , host=r['host'], port=r['port'], expired=r.get('expired', expired)
+                    , usr=r.get('usr', ''), pwd=r.get('pwd', '')
+                    , location=r.get('location', ''),isok=True, validCount=0,failedCount=0)
 
     def _headers(self):
-        number = random.randint(0, len(agents)-1)
-        return {'user-agent': agents[number]}
+        # number = random.randint(0, len(agents)-1)
+        return {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36'}
 
     async def _feth(self, results, url):
         logging.debug("Fetching page [%s] by spider [%s]." % (url, type(self).__name__))
         try:
             html = None
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=self._headers(), proxy=setting.spider_proxy) as response:
+                async with session.get(url, headers=self._headers()) as response:
                     html = await response.text()
 
             self._parse(results, html)

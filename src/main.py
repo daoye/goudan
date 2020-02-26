@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-from core import dispatcher, rproxy
-from threading import Thread
 import sys
+import os
 import setting
-import asyncio
 import logging
 import argparse
+import asyncio
+import signal
+from pony.orm import *
+from core.data import Pool, db_bind
+from core import FILE
+from core.rproxy import RProxy
+from core import hosting
 
 
-def run_dispatcher():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    _dispatcher = dispatcher.Dispatcher()
-    _dispatcher.run()
 
 
 def parse_args():
@@ -26,40 +25,52 @@ For more information visit: https://github.com/daoye/goudan
     parser = argparse.ArgumentParser(description=info)
     parser.add_argument('-r', '--retry', type=int, default=5,
                         help="If proxy host connect failed, goudan will retry use another proxy. This argument tell goudan number of retries, default is 5.")
-    parser.add_argument('-t', '--type', type=str, choices=['http', 'https', 'http/https', 'socks'], default="http/https",
-                        help="Set tunnel proxy's type. The optional values are http,https,http/https,socks, default is http/https.")
-    parser.add_argument('-l', '--host', type=str, default="0.0.0.0",
-                        help="Set tunnel proxy's host. It is an ip address, default is 0.0.0.0.")
-    parser.add_argument('-p', '--port', type=int, default=1991,
-                        help="Set tunnel proxy's port. It is a number(0~65535), default is 1991.")
-    parser.add_argument('-i', '--idle_time', type=int, default=1,
-                        help="Set dispatcher's idle time, default is 1, unit:minutes.")
-    parser.add_argument('--spider_proxy', type=str,
-                        help="Set the spider's proxy, like this: http://127.0.0.1:1080")
-    parser.add_argument('--test_timeout', type=int, default=10,
-                        help="Set timeout to valid proxy host, default is 10, unit:seconds.")
+    parser.add_argument('-l', '--listen', type=str, default="http:0.0.0.0:1991,https:0.0.0.0:1992,socks4:0.0.0.0:1993,socks5:0.0.0.0:1994",
+                        help="Set tunnel proxy's hosts. This can be specified more than one host. To define host use this format: protocol:ip:port,protocol:ip:port,...  The protocol could be http,https,socks4,socks5.")
+
     parser.add_argument('--log_level', type=int, choices=[logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR],
-                        default=20, help="Set log level, The optional values are :10=DEBUG,20=INFO,30=WARNING,40=ERROR, default is 20.")
+                        default=20, help="Set log level, The optional values are: 10=DEBUG,20=INFO,30=WARNING,40=ERROR, default is 20.")
     args = parser.parse_args()
-    setting.proxy_retry = args.retry
-    setting.proxy_type = args.type
-    setting.server_host = args.host
-    setting.server_port = args.port
-    setting.spider_proxy = args.spider_proxy
-    setting.test_timeout = args.test_timeout
-    setting.idle_time = args.idle_time
+    setting.retry = args.retry
+    for x in args.listen.split(','):
+        (protocol, host, port) = x.split(':')
+        setting.svr[protocol] = '%s:%s' %(host, port)
     setting.log_level = args.log_level
 
 
+def term(sig_num, addtion):
+    hosting.stop()
+    exit(1)
+
 if __name__ == '__main__':
     parse_args()
-    logging.basicConfig(level=setting.log_level,
-                        format="%(asctime)s - %(levelname)s - %(message)s")
-    logging.getLogger("urllib3").setLevel(logging.FATAL)
-    try:
-        d_thread = Thread(target=run_dispatcher, daemon=True)
-        d_thread.start()
+    logging.basicConfig(level=setting.log_level, format="%(asctime)s - %(levelname)s - %(message)s")
+    signal.signal(signal.SIGTERM, term)
+    signal.signal(signal.SIGILL, term)
 
-        rproxy.start()
-    except InterruptedError:
-        pass
+    db_bind()
+
+    try:
+        loop = asyncio.get_event_loop()
+
+        proxes = []
+        pool = Pool()
+        for protocol,v in setting.svr.items():
+            (host, port) = v.split(':')
+            r = RProxy(protocol, host, int(port), pool)
+            proxes.append(r)
+
+        # run plugin host.
+        hosting.launch()
+
+        # run RProxy server.
+        for p in proxes:
+            p.start()
+
+        loop.run_forever()
+    finally:
+        loop.run_until_complete(loop.shutdown_asyncgens())
+        loop.close()
+        for p in proxes:
+            p.stop()
+        hosting.stop()
