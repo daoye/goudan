@@ -9,7 +9,7 @@ import argparse
 import asyncio
 import signal
 from pony.orm import *
-from core.data import Pool, db_bind
+from core.data import ProxyPool, db_bind
 from core import FILE
 from core.rproxy import RProxy
 from core import hosting
@@ -40,28 +40,29 @@ For more information visit: https://github.com/daoye/goudan
 
 def term(sig_num, addtion):
     hosting.stop()
-    exit(1)
+    exit(0)
 
 if __name__ == '__main__':
     parse_args()
     logging.basicConfig(level=setting.log_level, format="%(asctime)s - %(levelname)s - %(message)s")
     signal.signal(signal.SIGTERM, term)
     signal.signal(signal.SIGILL, term)
+    signal.signal(signal.SIGINT, term)
 
     db_bind()
+
+    # run plugin host.
+    hosting.launch()
 
     try:
         loop = asyncio.get_event_loop()
 
         proxes = []
-        pool = Pool()
-        for protocol,v in setting.svr.items():
+        proxyPool = ProxyPool()
+        for protocol, v in setting.svr.items():
             (host, port) = v.split(':')
-            r = RProxy(protocol, host, int(port), pool)
+            r = RProxy(protocol, host, int(port), proxyPool)
             proxes.append(r)
-
-        # run plugin host.
-        hosting.launch()
 
         # run RProxy server.
         for p in proxes:

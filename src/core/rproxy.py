@@ -8,14 +8,13 @@ import functools
 import logging
 
 class RProxy():
-    def __init__(self, protocol, host, port, pool):
+    def __init__(self, protocol, host, port, proxyPool):
         self.protocol = protocol
         self.host = host
         self.port = port
-        self.pool = pool
+        self.proxyPool = proxyPool
         self.loop = asyncio.get_event_loop()
         self.sock = None
-
 
     def start(self):
         addr = (self.host, self.port)
@@ -27,7 +26,6 @@ class RProxy():
 
         asyncio.Task(self._accept())
 
-
     def stop(self):
         try:
             self.sock.shutdown(socket.SHUT_RDWR)
@@ -35,15 +33,14 @@ class RProxy():
         except:
             pass
 
-
     async def _accept(self):
         s_client, client_addr = await self.loop.sock_accept(self.sock)
         asyncio.Task(self._process(s_client, client_addr))
         if self.loop.is_running():
             asyncio.Task(self._accept())
 
-
     async def _process(self, s_client, client_addr):
+        #  import pdb; pdb.set_trace()
         s_client.setblocking(False)
         logging.debug('Client %s:%s connected' % client_addr)
         
@@ -53,9 +50,11 @@ class RProxy():
         s_remote = None
         remote_addr = None
         while retry:
-            proxy = self.pool.get(self.protocol)
+            proxy = self.proxyPool.get(self.protocol)
             if not proxy:
-                break
+                logging.info('There is no proxy for protocol [%s]' % self.protocol)
+                s_client.close()
+                return
 
             logging.debug('Try connect to [%s://%s:%s]' % (proxy.protocol, proxy.host, proxy.port))
             try:
@@ -70,7 +69,8 @@ class RProxy():
                 success = True
                 break
             except:
-                # logging.exception("Connect failed  [%s://%s:%s] will retry (retry [%s] times)." % (proxy.protocol, proxy.host, proxy.port, retry))
+                logging.debug("Connect failed  [%s://%s:%s] will retry (retry [%s] times)."
+                              % (proxy.protocol, proxy.host, proxy.port, retry))
                 retry -= 1
 
         if not success:
@@ -89,7 +89,7 @@ class RProxy():
                 asyncio.Task(self.loop.sock_sendall(w, data))
                 return
         except Exception as e:
-            logging.debug("Recive data error:%s" % e)
+            logging.info("Recive data error: %s" % e)
 
         try:
             r.shutdown(socket.SHUT_RDWR)
@@ -107,4 +107,3 @@ class RProxy():
 
         logging.debug('%s:%s disconnected!' % w_addr)
         logging.debug('%s:%s disconnected!' % r_addr)
-
