@@ -20,13 +20,13 @@ This why I start this project.
 ### Use by docker(Recommend)
 
 ```bash
-docker run -p 1991:1991 -p 1992:1992 -p 1993:1993 -p 1994:1994 -d --restart always --name goudan daoye/goudan
+docker run -p 1991:1991 -p 1992:1992 -p 1993:1993 -p 1994:1994 -d --restart unless-stopped --ulimit nofile=2048:2048 --ulimit nproc=1024 --name goudan daoye/goudan
 ```
 
 or
 
 ```bash
-docker run -p 1991:1991 -p 1994:1994 -d --restart always --name goudan daoye/goudan --log_level 10 -r 10 -l http:0.0.0.0:1991,socks5:0.0.0.0:1994
+docker run -p 1991:1991 -p 1994:1994 -d --restart unless-stopped --ulimit nofile=2048:2048 --ulimit nproc=1024 --name goudan daoye/goudan --log_level 10 -r 10 -l http:0.0.0.0:1991,socks5:0.0.0.0:1994
 ```
 
 If you want see some help documents:
