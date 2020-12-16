@@ -22,8 +22,8 @@ def launch():
     logging.info('Detected [%d] plugins.' % len(setting.plugins))
     global _pool
     _pool = Pool(1)
-    _pool.apply_async(_run_process, ("`".join(setting.plugins),))
-    #  _pool.apply(_run_process, ("`".join(setting.plugins),))
+    #  _pool.apply_async(_run_process, ("`".join(setting.plugins),))
+    _pool.apply(_run_process, ("`".join(setting.plugins),))
 
 
 def stop():
@@ -69,7 +69,7 @@ class Hosting():
             try:
                 p.start(self)
             except:
-                logging.error('[%s] run failed!' % p)
+                logging.exception('[%s] run failed!' % p)
 
         if self.loop.is_running():
             self.loop.call_later(
@@ -123,7 +123,7 @@ class Hosting():
 
                 logging.info('Plugin load completed [%s]' % x)
             except:
-                logging.error("Plugin load failed [%s]" % x)
+                logging.exception("Plugin load failed [%s]" % x)
 
     def _download_remote_plugin(self, filename, url):
         r = requests.get(url)
