@@ -14,6 +14,8 @@ svr = {
 }
 
 plugins = [
+    "/home/father/projects/goudan_plugins/src/scanner.py",
+    "/home/father/projects/goudan_plugins/src/spiders/ProxyIpLib.py",
     # "C:\\Projects\\goudan_plugins\\src\\example.py",
     # "C:\\Projects\\goudan_plugins\\src\\spiders\\data5uSpider.py",
     # "C:\\Projects\\goudan_plugins\\src\\spiders\\freeHTTPSpider.py",
@@ -21,10 +23,12 @@ plugins = [
     # "C:\\Projects\\goudan_plugins\\src\\spiders\\kuaidailiSpider.py",
     # "C:\\Projects\\goudan_plugins\\src\\spiders\\spysoneSpider.py",
     # "C:\\Projects\\goudan_plugins\\src\\spiders\\xiciSpider.py"
+    "https://raw.githubusercontent.com/daoye/goudan_plugins/master/src/scanner.py",
     "https://raw.githubusercontent.com/daoye/goudan_plugins/master/src/spiders/data5uSpider.py",
     "https://raw.githubusercontent.com/daoye/goudan_plugins/master/src/spiders/freeHTTPSpider.py",
     "https://raw.githubusercontent.com/daoye/goudan_plugins/master/src/spiders/kuaidailiSpider.py",
     "https://raw.githubusercontent.com/daoye/goudan_plugins/master/src/spiders/spysoneSpider.py",
+    "https://raw.githubusercontent.com/daoye/goudan_plugins/master/src/spiders/proxyIpLib.py",
     "https://raw.githubusercontent.com/daoye/goudan_plugins/master/src/spiders/xiciSpider.py"
 ]
 
