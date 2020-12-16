@@ -3,19 +3,18 @@
 Goudan(狗蛋)is a tunnel proxy, it's support all tcp proxy(theoretically), such as http,https,socks.
 By default, goudan crawl free proxies from some websites. So, you can use it out of box.
 
-## Why do this
-
-When I develop a spider to crawl some web sites, most time they have some defense measures.
-
-So, I must change my IP to crawl it at a moment.
-
-The best way is set a proxy address for a web requests libray, such as "Requests","urlib", "aiohttp" and so on.
-
-But, I need write those code in every project. And I want't to do this.
-
-This why I start this project.
-
 ## How to use
+
+### Install masscan
+The plugin 'scanner' use masscan to scan proxy from internal , if you use this plugin, you need install masscan.
+
+On ubuntu, install it by this command:
+
+```bash
+sudo apt -y install masscan
+
+````
+
 
 ### Use by docker(Recommend)
 
