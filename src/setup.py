@@ -28,7 +28,7 @@ For more information visit: https://github.com/daoye/goudan
     install_requires=[
         "aiohttp==3.7.4",
         "lxml==4.9.1",
-        "urllib3==1.24.2",
+        "urllib3==1.26.17",
         "pony==0.7.12",
         "requests==2.22.0"
     ],
