@@ -30,7 +30,7 @@ For more information visit: https://github.com/daoye/goudan
         "lxml==4.9.1",
         "urllib3==1.24.2",
         "pony==0.7.12",
-        "requests==2.22.0"
+        "requests==2.31.0"
     ],
     py_modules=['goudan']
 )
