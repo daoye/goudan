@@ -26,7 +26,7 @@ For more information visit: https://github.com/daoye/goudan
         'Programming Language :: Python :: 3.7'
     ],
     install_requires=[
-        "aiohttp==3.8.5",
+        "aiohttp==3.8.6",
         "lxml==4.9.1",
         "urllib3==1.26.17",
         "pony==0.7.12",
