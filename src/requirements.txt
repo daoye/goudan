@@ -1,4 +1,4 @@
-aiohttp==3.8.5
+aiohttp==3.9.0
 lxml==4.9.1
 urllib3==1.26.17
 pony==0.7.14
